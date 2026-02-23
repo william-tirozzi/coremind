@@ -1,5 +1,5 @@
 // ============================================================
-// PSFC — Importer UI Logic (importer-ui.js)
+// COREMIND — Importer UI Logic (importer-ui.js)
 // Gestisce drag&drop, stepper, preview tabelle, confirm import
 // ============================================================
 

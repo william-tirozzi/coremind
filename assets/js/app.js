@@ -1,5 +1,5 @@
 // ============================================================
-// PSFC — Main App Logic (index.html)
+// COREMIND — Main App Logic (index.html)
 // Gestisce: Staffing Grid, DB Progetti, Risorse, Import TSV
 // ============================================================
 

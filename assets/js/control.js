@@ -1,5 +1,5 @@
 // ============================================================
-// PSFC — Control View Logic (control.js)
+// COREMIND — Control View Logic (control.js)
 // Risorse raggruppate per Progetto — Piano vs Consuntivo
 // ============================================================
 

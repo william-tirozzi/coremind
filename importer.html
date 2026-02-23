@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PSFC — Import Excel Planning</title>
+    <title>COREMIND — Import Excel Planning</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -852,8 +852,8 @@
         <a class="tn-brand" href="home.html">
             <div class="tn-mark"><i class="bi bi-grid-3x3-gap-fill"></i></div>
             <div>
-                <div class="tn-name">PSFC</div>
-                <div class="tn-ver">Project Staffing & Financial Control</div>
+                <div class="tn-name">COREMIND</div>
+                <div class="tn-ver">Smart Project Intelligence</div>
             </div>
         </a>
         <nav class="tn-links">
@@ -1171,14 +1171,14 @@
     <script src="assets/js/importer-ui.js"></script>
     <script>
         /* ========== AUTH ========== */
-        const user = JSON.parse(sessionStorage.getItem('psfc_user') || 'null');
+        const user = JSON.parse(sessionStorage.getItem('coremind_user') || 'null');
         if (!user) location.href = 'login.html';
         else {
             const name = user.name || user.email;
             document.getElementById('sb-av').textContent = name.slice(0, 2).toUpperCase();
             document.getElementById('sb-name').textContent = name;
         }
-        function logout() { sessionStorage.removeItem('psfc_user'); location.href = 'login.html'; }
+        function logout() { sessionStorage.removeItem('coremind_user'); location.href = 'login.html'; }
 
         /* ========== DOWNLOAD TEMPLATE ========== */
         function downloadTemplate() {
@@ -1229,7 +1229,7 @@
             wsM26['!cols'] = [{ wch: 24 }, { wch: 20 }];
             XLSX.utils.book_append_sheet(wb, wsM26, 'MASTER 2026');
 
-            XLSX.writeFile(wb, 'PSFC_Planning_Template.xlsx');
+            XLSX.writeFile(wb, 'COREMIND_Planning_Template.xlsx');
         }
 
         /* ========== STEP 2 TABS ========== */

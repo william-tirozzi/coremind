@@ -1,5 +1,5 @@
 // ============================================================
-// PSFC — Excel Importer (SheetJS + SmartMapper)
+// COREMIND — Excel Importer (SheetJS + SmartMapper)
 // Supporta import nativo .xlsx con mapping automatico dei fogli
 // ============================================================
 

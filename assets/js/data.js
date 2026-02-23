@@ -1,5 +1,5 @@
 // ============================================================
-// PSFC — Centralized Data Store
+// COREMIND — Centralized Data Store
 // Struttura basata su: MASTER 2025/2026, DB, RISORSE, PER CODIFICA
 // ============================================================
 
@@ -175,7 +175,7 @@ const DATA = {
     // --------------------------------------------------------
     masterData: {
         2025: {
-            projectId: "PSFC-MASTER-2025",
+            projectId: "COREMIND-MASTER-2025",
             client: "Portfolio Clienti 2025",
             totalBudget: 1945000,
             invoicedYTD: 820000,
@@ -184,7 +184,7 @@ const DATA = {
             notes: "Anno di consolidamento. Focus Financial Services e PA."
         },
         2026: {
-            projectId: "PSFC-MASTER-2026",
+            projectId: "COREMIND-MASTER-2026",
             client: "Portfolio Clienti 2026",
             totalBudget: 2310000,
             invoicedYTD: 0,
@@ -474,7 +474,7 @@ function seedData() {
         });
     });
 
-    console.log(`[PSFC] Database seeded: ${DATA.resources.length} risorse, ${DATA.projects.length} progetti, ${DATA.bookings.length} booking.`);
+    console.log(`[COREMIND] Database seeded: ${DATA.resources.length} risorse, ${DATA.projects.length} progetti, ${DATA.bookings.length} booking.`);
 }
 
 seedData();
