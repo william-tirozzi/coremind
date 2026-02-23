@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSFC — Project Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07080f;
+            --panel: rgba(14, 17, 32, 0.85);
+            --glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.07);
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --text: rgba(255, 255, 255, 0.85);
+            --muted: rgba(255, 255, 255, 0.35);
+            --topnav-h: 60px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 700px 500px at 15% 0%, rgba(99, 102, 241, .12) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 600px at 90% 100%, rgba(139, 92, 246, .10) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 400px at 60% 50%, rgba(6, 182, 212, .05) 0%, transparent 70%);
+        }
+
+        /* ============ TOPNAV ============ */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topnav-h);
+            z-index: 100;
+            background: rgba(7, 8, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 24px;
+        }
+
+        .topnav::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5) 30%, rgba(139, 92, 246, 0.5) 70%, transparent);
+        }
+
+        .tn-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .tn-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+            box-shadow: 0 0 14px rgba(99, 102, 241, .45);
+            flex-shrink: 0;
+        }
+
+        .tn-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .tn-ver {
+            font-size: 0.6rem;
+            color: var(--muted);
+        }
+
+        .tn-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .tn-link {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 0.83rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+
+        .tn-link i {
+            font-size: 0.9rem;
+        }
+
+        .tn-link:hover {
+            background: var(--glass);
+            color: var(--text);
+        }
+
+        .tn-link.active {
+            background: rgba(99, 102, 241, .14);
+            color: #a5b4fc;
+            font-weight: 600;
+        }
+
+        .tn-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+        }
+
+        .tn-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .tn-uname {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .tn-logout {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: color .15s;
+            font-size: 1rem;
+        }
+
+        .tn-logout:hover {
+            color: #f87171;
+        }
+
+        /* ============ MAIN ============ */
+        .main {
+            padding-top: calc(var(--topnav-h) + 32px);
+            padding: calc(var(--topnav-h) + 32px) 32px 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ PAGE HEADER ============ */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .page-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            background: rgba(99, 102, 241, .18);
+            color: #a5b4fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: white;
+        }
+
+        .page-sub {
+            font-size: 0.84rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* ============ GLASS CARD ============ */
+        .glass-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        }
+
+        .card-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .card-body-pad {
+            padding: 20px;
+        }
+
+        /* ============ FILTER ROW ============ */
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .dark-select,
+        .dark-input {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 9px;
+            padding: 8px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.83rem;
+            outline: none;
+            transition: border-color .15s;
+            min-width: 160px;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.35)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        .dark-select:focus,
+        .dark-input:focus {
+            border-color: rgba(99, 102, 241, .5);
+        }
+
+        .dark-select option {
+            background: #0e1120;
+            color: var(--text);
+        }
+
+        /* ============ BTN ============ */
+        .btn-primary-dark {
+            background: var(--indigo);
+            color: white;
+            border: none;
+            border-radius: 9px;
+            padding: 9px 20px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            box-shadow: 0 0 16px rgba(99, 102, 241, .3);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-primary-dark:hover {
+            background: #5254cc;
+            box-shadow: 0 0 20px rgba(99, 102, 241, .5);
+        }
+
+        /* ============ KPI ROW ============ */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .kpi {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: border-color .2s, transform .2s;
+        }
+
+        .kpi:hover {
+            border-color: rgba(99, 102, 241, .3);
+            transform: translateY(-2px);
+        }
+
+        .kpi::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.12;
+            filter: blur(30px);
+            pointer-events: none;
+        }
+
+        .kpi-0::after {
+            background: #6366f1;
+        }
+
+        .kpi-1::after {
+            background: #06b6d4;
+        }
+
+        .kpi-2::after {
+            background: #f59e0b;
+        }
+
+        .kpi-3::after {
+            background: #10b981;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .kpi-val {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .kpi-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+        }
+
+        /* ============ GRID ============ */
+        .grid-2-1 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* ============ CHART CANVAS ============ */
+        .chart-wrap {
+            padding: 20px;
+        }
+
+        /* ============ MASTER INFO ============ */
+        .master-grid {
+            display: grid;
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .master-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .master-row:last-child {
+            border-bottom: none;
+        }
+
+        .master-key {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .master-val {
+            font-size: 0.85rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--muted);
+            font-size: 0.82rem;
+            gap: 8px;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            opacity: 0.4;
+        }
+
+        /* ============ TABLE ============ */
+        .dark-table-wrap {
+            overflow-x: auto;
+        }
+
+        .dark-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .dark-table th {
+            padding: 11px 14px;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            white-space: nowrap;
+        }
+
+        .dark-table th.text-end,
+        .dark-table td.text-end {
+            text-align: right;
+        }
+
+        .dark-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .dark-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* badges */
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .badge-ok {
+            background: rgba(16, 185, 129, .18);
+            color: #6ee7b7;
+        }
+
+        .badge-warn {
+            background: rgba(245, 158, 11, .18);
+            color: #fcd34d;
+        }
+
+        .badge-bad {
+            background: rgba(244, 63, 94, .18);
+            color: #fda4af;
+        }
+
+        /* ============ GROUPED TABLE ============ */
+        .proj-group-row td {
+            background: rgba(99, 102, 241, .08);
+            border-top: 1px solid rgba(99, 102, 241, .2);
+            border-bottom: 1px solid rgba(99, 102, 241, .15);
+            padding: 10px 14px;
+            font-weight: 700;
+            color: #a5b4fc;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .proj-group-row:hover td {
+            background: rgba(99, 102, 241, .13);
+        }
+
+        .proj-group-row .proj-toggle {
+            transition: transform .2s;
+            display: inline-block;
+        }
+
+        .proj-group-row.collapsed .proj-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .res-row td {
+            padding-left: 36px;
+        }
+
+        .res-row.hidden {
+            display: none;
+        }
+
+        .chip-skill {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: rgba(139, 92, 246, .15);
+            color: #c4b5fd;
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======= TOPNAV ======= -->
+    <header class="topnav">
+        <a class="tn-brand" href="home.html">
+            <div class="tn-mark"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div>
+                <div class="tn-name">PSFC</div>
+                <div class="tn-ver">Project Staffing & Financial Control</div>
+            </div>
+        </a>
+        <nav class="tn-links">
+            <a class="tn-link" href="home.html"><i class="bi bi-house-fill"></i> Dashboard</a>
+            <a class="tn-link" href="index.html"><i class="bi bi-people-fill"></i> Staffing Grid</a>
+            <a class="tn-link active" href="control.html"><i class="bi bi-graph-up-arrow"></i> Project Control</a>
+            <a class="tn-link" href="importer.html"><i class="bi bi-cloud-upload-fill"></i> Import Excel</a>
+        </nav>
+        <div class="tn-user">
+            <div class="tn-avatar" id="sb-av">DU</div>
+            <div>
+                <div class="tn-uname" id="sb-name">Demo User</div>
+            </div>
+            <button class="tn-logout" title="Logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </header>
+
+    <main class="main">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <div>
+                <div class="page-title">Monitoraggio Finanziario Mensile</div>
+                <div class="page-sub">Piano vs Consuntivo per progetto — giorni e costi</div>
+            </div>
+        </div>
+
+        <!-- Filtri -->
+        <div class="filter-row"
+            style="background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px;">
+            <div class="filter-group">
+                <div class="filter-label">Mese</div>
+                <select class="dark-select" id="month-select" style="min-width:160px;">
+                    <option value="1">Gennaio</option>
+                    <option value="2">Febbraio</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Aprile</option>
+                    <option value="5">Maggio</option>
+                    <option value="6">Giugno</option>
+                    <option value="7">Luglio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Settembre</option>
+                    <option value="10">Ottobre</option>
+                    <option value="11">Novembre</option>
+                    <option value="12">Dicembre</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <div class="filter-label">Anno</div>
+                <select class="dark-select" id="ctrl-year-select" style="min-width:110px;">
+                    <option value="2025" selected>2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+            <div class="filter-group" style="justify-content:flex-end;">
+                <div class="filter-label">&nbsp;</div>
+                <button class="btn-primary-dark" id="btn-load-report">
+                    <i class="bi bi-play-fill"></i> Carica Report
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI Varianza -->
+        <div class="kpi-row">
+            <div class="kpi kpi-0">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(99,102,241,.18);color:#a5b4fc"><i
+                            class="bi bi-briefcase-fill"></i></div>
+                </div>
+                <div class="kpi-val" id="val-budget">—</div>
+                <div class="kpi-label">Budget Portfolio</div>
+            </div>
+            <div class="kpi kpi-1">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(6,182,212,.18);color:#67e8f9"><i
+                            class="bi bi-bar-chart-line"></i></div>
+                </div>
+                <div class="kpi-val" id="val-planned" style="color:#67e8f9">€ 0</div>
+                <div class="kpi-label">Pianificato (Mese)</div>
+            </div>
+            <div class="kpi kpi-2">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(245,158,11,.18);color:#fcd34d"><i
+                            class="bi bi-receipt"></i></div>
+                </div>
+                <div class="kpi-val" id="val-actual" style="color:#fcd34d">€ 0</div>
+                <div class="kpi-label">Consuntivo (Mese)</div>
+            </div>
+            <div class="kpi kpi-3">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(16,185,129,.18);color:#6ee7b7"><i
+                            class="bi bi-arrow-up-down"></i></div>
+                </div>
+                <div class="kpi-val" id="val-variance" style="color:#6ee7b7">€ 0</div>
+                <div class="kpi-label">Varianza</div>
+            </div>
+        </div>
+
+        <!-- Chart: Costi per Progetto -->
+        <div class="glass-card" style="margin-bottom:16px;">
+            <div class="card-head">
+                <div class="card-title">Costi per Progetto — Piano vs Consuntivo <span id="chart-month-label"
+                        style="color:var(--muted);font-weight:400;font-size:0.8rem;margin-left:8px;"></span></div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="budgetChart" height="70"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabella raggruppata per Progetto -->
+        <div class="glass-card">
+            <div class="card-head">
+                <div class="card-title">Risorse per Progetto — Mese Selezionato</div>
+                <span id="table-summary" style="font-size:0.75rem;color:var(--muted);"></span>
+            </div>
+            <div class="dark-table-wrap">
+                <table class="dark-table">
+                    <thead>
+                        <tr>
+                            <th>Progetto / Risorsa</th>
+                            <th>Skills Area</th>
+                            <th class="text-end">Giorni Piano</th>
+                            <th class="text-end">Giorni Cons.</th>
+                            <th class="text-end">Delta gg</th>
+                            <th class="text-end">Costo Piano</th>
+                            <th class="text-end">Costo Cons.</th>
+                            <th>Stato</th>
+                        </tr>
+                    </thead>
+                    <tbody id="control-body">
+                        <tr>
+                            <td colspan="8" style="text-align:center;padding:36px;color:var(--muted);">
+                                <i class="bi bi-funnel"
+                                    style="font-size:1.5rem;opacity:0.4;display:block;margin-bottom:8px;"></i>
+                                Seleziona mese e anno, poi clicca Carica Report.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/export.js"></script>
+    <script src="assets/js/control.js"></script>
+    <script>
+        /* ========== AUTH ========== */
+        const user = JSON.parse(sessionStorage.getItem('psfc_user') || 'null');
+        if (!user) location.href = 'login.html';
+        else {
+            const name = user.name || user.email;
+            document.getElementById('sb-av').textContent = name.slice(0, 2).toUpperCase();
+            document.getElementById('sb-name').textContent = name;
+        }
+        function logout() { sessionStorage.removeItem('psfc_user'); location.href = 'login.html'; }
+    </script>
+</body>
+
+</html>

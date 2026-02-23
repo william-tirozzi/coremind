@@ -1,0 +1,208 @@
+/* ============================================================
+   PSFC — Custom Styles (Dark Theme)
+   Overrides e componenti condivisi tra le pagine
+   ============================================================ */
+
+/* ---- Billability badges — dark-friendly ---- */
+.badge-bill-BILLABLE {
+    background: rgba(16, 185, 129, .18);
+    color: #6ee7b7;
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-bill-NON-BILLABLE {
+    background: rgba(255, 255, 255, .08);
+    color: rgba(255, 255, 255, .45);
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-bill-CAPEX {
+    background: rgba(6, 182, 212, .18);
+    color: #67e8f9;
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-bill-OVERHEAD {
+    background: rgba(245, 158, 11, .18);
+    color: #fcd34d;
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-bill-INVESTMENT {
+    background: rgba(139, 92, 246, .18);
+    color: #c4b5fd;
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+/* ---- Skills Area chips — dark ---- */
+.chip-skill {
+    display: inline-block;
+    background: rgba(139, 92, 246, .15);
+    color: #c4b5fd;
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* ---- Staffing Grid: value colors ---- */
+.days-high {
+    color: #fda4af;
+    font-weight: 700;
+}
+
+/* >20 */
+.days-medium {
+    color: #fcd34d;
+    font-weight: 600;
+}
+
+/* >15 */
+.days-low {
+    color: #a5b4fc;
+}
+
+/* >0  */
+.days-empty {
+    color: rgba(255, 255, 255, .2);
+}
+
+/* 0   */
+
+/* ---- Staffing Grid: grouped rows ---- */
+.res-group-header {
+    background: rgba(99, 102, 241, .07);
+    border-top: 1px solid rgba(99, 102, 241, .18);
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: background .15s;
+}
+
+.res-group-header:hover {
+    background: rgba(99, 102, 241, .12);
+}
+
+.res-group-header td {
+    border-bottom: 1px solid rgba(99, 102, 241, .15);
+}
+
+.proj-sub-row td {
+    border-bottom: 1px solid rgba(255, 255, 255, .03);
+    background: rgba(0, 0, 0, .1);
+}
+
+.proj-sub-row:hover td {
+    background: rgba(99, 102, 241, .05);
+}
+
+.absence-sub-row td {
+    border-bottom: none;
+}
+
+.absence-sub-row:last-of-type td {
+    border-bottom: 1px solid rgba(255, 255, 255, .04);
+}
+
+/* ---- Resource cards (tab Risorse) ---- */
+.risorsa-card {
+    background: rgba(255, 255, 255, .03);
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 14px;
+    padding: 16px;
+    transition: border-color .2s, transform .2s;
+}
+
+.risorsa-card:hover {
+    border-color: rgba(99, 102, 241, .3);
+    transform: translateY(-2px);
+}
+
+.risorsa-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.adrc-bar {
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .08);
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.adrc-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+
+/* ---- ADRC label row ---- */
+.adrc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+    color: rgba(255, 255, 255, .4);
+}
+
+.adrc-row strong {
+    color: rgba(255, 255, 255, .75);
+    font-size: 0.8rem;
+}
+
+/* ---- Risorsa card footer ---- */
+.res-card-footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, .06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, .35);
+}
+
+.res-card-footer strong {
+    color: #a5b4fc;
+}
+
+/* ---- Rate level badge ---- */
+.badge-level {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(99, 102, 241, .15);
+    color: #a5b4fc;
+    flex-shrink: 0;
+}

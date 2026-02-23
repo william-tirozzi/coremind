@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSFC — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07080f;
+            --panel: rgba(14, 17, 32, 0.85);
+            --glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.07);
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --text: rgba(255, 255, 255, 0.85);
+            --muted: rgba(255, 255, 255, 0.35);
+            --topnav-h: 60px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============ FIXED BG ============ */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 700px 500px at 15% 0%, rgba(99, 102, 241, .12) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 600px at 90% 100%, rgba(139, 92, 246, .10) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 400px at 60% 50%, rgba(6, 182, 212, .05) 0%, transparent 70%);
+        }
+
+        /* ============ TOPNAV ============ */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topnav-h);
+            z-index: 100;
+            background: rgba(7, 8, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 24px;
+        }
+
+        .topnav::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5) 30%, rgba(139, 92, 246, 0.5) 70%, transparent);
+        }
+
+        .tn-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .tn-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+            box-shadow: 0 0 14px rgba(99, 102, 241, .45);
+            flex-shrink: 0;
+        }
+
+        .tn-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .tn-ver {
+            font-size: 0.6rem;
+            color: var(--muted);
+        }
+
+        .tn-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .tn-link {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 0.83rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+
+        .tn-link i {
+            font-size: 0.9rem;
+        }
+
+        .tn-link:hover {
+            background: var(--glass);
+            color: var(--text);
+        }
+
+        .tn-link.active {
+            background: rgba(99, 102, 241, .14);
+            color: #a5b4fc;
+            font-weight: 600;
+        }
+
+        .tn-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+        }
+
+        .tn-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .tn-uname {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .tn-logout {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: color .15s;
+            font-size: 1rem;
+        }
+
+        .tn-logout:hover {
+            color: #f87171;
+        }
+
+        /* ============ MAIN ============ */
+        .main {
+            padding-top: calc(var(--topnav-h) + 32px);
+            padding-left: 32px;
+            padding-right: 32px;
+            padding-bottom: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ TOP BAR ============ */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .topbar-left h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.7px;
+            color: white;
+        }
+
+        .topbar-left p {
+            font-size: 0.84rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .topbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .year-toggle {
+            display: flex;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .year-btn {
+            padding: 8px 18px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .15s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .year-btn.active {
+            background: var(--indigo);
+            color: white;
+            box-shadow: 0 0 12px rgba(99, 102, 241, .4);
+        }
+
+        .date-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .date-pill i {
+            color: #6366f1;
+        }
+
+        /* ============ KPI ROW ============ */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .kpi {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: border-color .2s, transform .2s;
+            cursor: default;
+        }
+
+        .kpi:hover {
+            border-color: rgba(99, 102, 241, .3);
+            transform: translateY(-2px);
+        }
+
+        .kpi::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.12;
+            filter: blur(30px);
+            pointer-events: none;
+        }
+
+        .kpi-0::after {
+            background: #6366f1;
+        }
+
+        .kpi-1::after {
+            background: #10b981;
+        }
+
+        .kpi-2::after {
+            background: #f59e0b;
+        }
+
+        .kpi-3::after {
+            background: #f43f5e;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .kpi-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .kpi-val {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .kpi-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+        }
+
+        /* ============ CHARTS LAYOUT ============ */
+        .grid-2-1 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .grid-3-2 {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 14px;
+        }
+
+        /* ============ GLASS CARD ============ */
+        .glass-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        }
+
+        .card-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .card-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .card-sub {
+            font-size: 0.73rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ============ TOP PROJ ============ */
+        .proj-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .proj-item:last-child {
+            border-bottom: none;
+        }
+
+        .proj-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .proj-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text);
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .proj-cli {
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .proj-track {
+            width: 70px;
+            height: 4px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .proj-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .proj-pct {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: white;
+            min-width: 32px;
+            text-align: right;
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======= TOPNAV ======= -->
+    <header class="topnav">
+        <a class="tn-brand" href="home.html">
+            <div class="tn-mark"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div>
+                <div class="tn-name">PSFC</div>
+                <div class="tn-ver">Project Staffing & Financial Control</div>
+            </div>
+        </a>
+
+        <nav class="tn-links">
+            <a class="tn-link active" href="home.html"><i class="bi bi-house-fill"></i> Dashboard</a>
+            <a class="tn-link" href="index.html"><i class="bi bi-people-fill"></i> Staffing Grid</a>
+            <a class="tn-link" href="control.html"><i class="bi bi-graph-up-arrow"></i> Project Control</a>
+            <a class="tn-link" href="importer.html"><i class="bi bi-cloud-upload-fill"></i> Import Excel</a>
+        </nav>
+
+        <div class="tn-user">
+            <div class="tn-avatar" id="sb-av">DU</div>
+            <div>
+                <div class="tn-uname" id="sb-name">Demo User</div>
+            </div>
+            <button class="tn-logout" title="Logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </header>
+
+    <!-- ======= MAIN ======= -->
+    <main class="main">
+
+        <!-- Top bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Dashboard <span style="color:var(--muted);font-weight:400">Overview</span></h1>
+                <p>Portfolio KPI · Costi · Risorse · Anno <span id="year-label">2025</span></p>
+            </div>
+            <div class="topbar-controls">
+                <div class="year-toggle">
+                    <button class="year-btn active" id="ybtn-2025" onclick="setYear(2025)">2025</button>
+                    <button class="year-btn" id="ybtn-2026" onclick="setYear(2026)">2026</button>
+                </div>
+                <div class="date-pill"><i class="bi bi-calendar3"></i><span id="today"></span></div>
+            </div>
+        </div>
+
+        <!-- KPI Row -->
+        <div class="kpi-row">
+            <div class="kpi kpi-0">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(99,102,241,.18);color:#a5b4fc"><i
+                            class="bi bi-people-fill"></i></div>
+                    <span class="kpi-badge" style="background:rgba(99,102,241,.18);color:#a5b4fc">Risorse</span>
+                </div>
+                <div class="kpi-val" id="kv-res">—</div>
+                <div class="kpi-label">Risorse in Portfolio</div>
+            </div>
+            <div class="kpi kpi-1">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(16,185,129,.18);color:#6ee7b7"><i
+                            class="bi bi-folder2-open"></i></div>
+                    <span class="kpi-badge" style="background:rgba(16,185,129,.18);color:#6ee7b7">Progetti</span>
+                </div>
+                <div class="kpi-val" id="kv-proj">—</div>
+                <div class="kpi-label">Progetti Attivi</div>
+            </div>
+            <div class="kpi kpi-2">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(245,158,11,.18);color:#fcd34d"><i
+                            class="bi bi-calendar3-range"></i></div>
+                    <span class="kpi-badge" style="background:rgba(245,158,11,.18);color:#fcd34d"
+                        id="kv-year-tag">2025</span>
+                </div>
+                <div class="kpi-val" id="kv-days">—</div>
+                <div class="kpi-label">Giorni Allocati (Piano)</div>
+            </div>
+            <div class="kpi kpi-3">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:rgba(244,63,94,.18);color:#fda4af"><i
+                            class="bi bi-currency-euro"></i></div>
+                    <span class="kpi-badge" style="background:rgba(244,63,94,.18);color:#fda4af">Budget</span>
+                </div>
+                <div class="kpi-val" id="kv-budget" style="font-size:1.5rem">—</div>
+                <div class="kpi-label">Budget Portfolio</div>
+            </div>
+        </div>
+
+        <!-- Row 1: Trend + Donut -->
+        <div class="grid-2-1">
+            <div class="glass-card">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">Costi Mensili — Piano vs Consuntivo</div>
+                        <div class="card-sub">Andamento portfolio · tutti i progetti</div>
+                    </div>
+                    <span class="tag" style="background:rgba(99,102,241,.15);color:#a5b4fc">Annuale</span>
+                </div>
+                <canvas id="c-trend" height="115"></canvas>
+            </div>
+            <div class="glass-card">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">Mix Billability</div>
+                        <div class="card-sub">Budget per categoria</div>
+                    </div>
+                </div>
+                <canvas id="c-bill" height="165"></canvas>
+            </div>
+        </div>
+
+        <!-- Row 2: 3 charts -->
+        <div class="grid-3">
+            <div class="glass-card">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">Skills Area</div>
+                        <div class="card-sub">Distribuzione headcount</div>
+                    </div>
+                    <span class="tag" style="background:rgba(16,185,129,.15);color:#6ee7b7">Risorse</span>
+                </div>
+                <canvas id="c-skills" height="175"></canvas>
+            </div>
+            <div class="glass-card">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">Market Segment</div>
+                        <div class="card-sub">Budget per segmento</div>
+                    </div>
+                </div>
+                <canvas id="c-market" height="175"></canvas>
+            </div>
+            <div class="glass-card">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">ADRC per Livello</div>
+                        <div class="card-sub">Media tariffa giornaliera</div>
+                    </div>
+                    <span class="tag" style="background:rgba(139,92,246,.15);color:#c4b5fd">2025 vs 2026</span>
+                </div>
+                <canvas id="c-adrc" height="175"></canvas>
+            </div>
+        </div>
+
+        <!-- Row 3: Top5 + Projects -->
+        <div class="grid-3-2">
+            <div class="glass-card">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">Top 5 Risorse — Allocazione Mensile</div>
+                        <div class="card-sub">Giorni piano per mese · anno selezionato</div>
+                    </div>
+                    <span class="tag" style="background:rgba(6,182,212,.15);color:#67e8f9">Piano</span>
+                </div>
+                <canvas id="c-top5" height="100"></canvas>
+            </div>
+            <div class="glass-card">
+                <div class="card-head">
+                    <div>
+                        <div class="card-title">Budget per Progetto</div>
+                        <div class="card-sub">Contributo % sul totale portfolio</div>
+                    </div>
+                </div>
+                <div id="proj-list"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script>
+        /* ========== AUTH ========== */
+        const user = JSON.parse(sessionStorage.getItem('psfc_user') || 'null');
+        if (!user) location.href = 'login.html';
+        else {
+            const name = user.name || user.email;
+            document.getElementById('sb-av').textContent = name.slice(0, 2).toUpperCase();
+            document.getElementById('sb-name').textContent = name;
+        }
+        function logout() { sessionStorage.removeItem('psfc_user'); location.href = 'login.html'; }
+
+        /* ========== DATE ========== */
+        document.getElementById('today').textContent =
+            new Date().toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+
+        /* ========== UTILS ========== */
+        const eur = v => new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+        const MONTHS = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+
+        // Dark Chart.js defaults
+        Chart.defaults.color = 'rgba(255,255,255,0.4)';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+        Chart.defaults.plugins.legend.labels.boxWidth = 10;
+        Chart.defaults.plugins.legend.labels.padding = 14;
+        Chart.defaults.plugins.legend.labels.font = { size: 10, family: 'Inter' };
+        Chart.defaults.font.family = 'Inter';
+
+        const PAL = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#f472b6', '#14b8a6'];
+        const charts = {};
+        let activeYear = 2025;
+
+        function setYear(y) {
+            activeYear = y;
+            document.getElementById('year-label').textContent = y;
+            document.getElementById('kv-year-tag').textContent = y;
+            document.getElementById('ybtn-2025').classList.toggle('active', y === 2025);
+            document.getElementById('ybtn-2026').classList.toggle('active', y === 2026);
+            refreshAll();
+        }
+
+        function kill(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+        /* ========== RENDER ========== */
+        function refreshAll() {
+            kpis(); trend(); bill(); skills(); market(); adrc(); top5(); projList();
+        }
+
+        function kpis() {
+            const y = activeYear;
+            document.getElementById('kv-res').textContent = DATA.resources.length;
+            document.getElementById('kv-proj').textContent = DATA.projects.length;
+            const days = DATA.bookings.filter(b => b.type === 'plan' && b.year === y).reduce((s, b) => s + b.days, 0);
+            document.getElementById('kv-days').textContent = days.toLocaleString('it-IT');
+            const bud = DATA.projects.reduce((s, p) => s + (p.budget || 0), 0);
+            document.getElementById('kv-budget').textContent = eur(bud);
+        }
+
+        function trend() {
+            kill('trend');
+            const y = activeYear;
+            const pl = [], ac = [];
+            for (let m = 1; m <= 12; m++) {
+                pl.push(DATA.bookings.filter(b => b.type === 'plan' && b.year === y && b.month === m).reduce((s, b) => s + b.cost, 0));
+                ac.push(DATA.bookings.filter(b => b.type === 'actual' && b.year === y && b.month === m).reduce((s, b) => s + b.cost, 0));
+            }
+            charts['trend'] = new Chart(document.getElementById('c-trend'), {
+                type: 'line',
+                data: {
+                    labels: MONTHS,
+                    datasets: [
+                        { label: 'Piano (€)', data: pl, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#6366f1', fill: true, tension: 0.4 },
+                        { label: 'Consuntivo (€)', data: ac, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#f59e0b', fill: true, tension: 0.4, borderDash: [5, 4] }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => '€' + (v / 1000).toFixed(0) + 'k', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function bill() {
+            kill('bill');
+            const m = {};
+            DATA.projects.forEach(p => { m[p.billability] = (m[p.billability] || 0) + (p.budget || 0); });
+            charts['bill'] = new Chart(document.getElementById('c-bill'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(m), datasets: [{ data: Object.values(m), backgroundColor: PAL, borderWidth: 0, hoverBorderWidth: 2, hoverBorderColor: 'rgba(255,255,255,0.3)' }] },
+                options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.label}: ${eur(c.raw)}` } } } }
+            });
+        }
+
+        function skills() {
+            kill('skills');
+            const m = {};
+            DATA.resources.forEach(r => { m[r.skillsArea] = (m[r.skillsArea] || 0) + 1; });
+            const sorted = Object.entries(m).sort((a, b) => b[1] - a[1]);
+            charts['skills'] = new Chart(document.getElementById('c-skills'), {
+                type: 'bar',
+                data: { labels: sorted.map(([k]) => k), datasets: [{ data: sorted.map(([, v]) => v), backgroundColor: PAL.map(c => c + 'bb'), borderRadius: 5, borderSkipped: false }] },
+                options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { font: { size: 9 } }, grid: { display: false } } } }
+            });
+        }
+
+        function market() {
+            kill('market');
+            const m = {};
+            DATA.projects.forEach(p => { m[p.marketSegment] = (m[p.marketSegment] || 0) + (p.budget || 0); });
+            charts['market'] = new Chart(document.getElementById('c-market'), {
+                type: 'pie',
+                data: { labels: Object.keys(m), datasets: [{ data: Object.values(m), backgroundColor: PAL.slice(2), borderWidth: 0 }] },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => `${c.label}: ${eur(c.raw)}` } } } }
+            });
+        }
+
+        function adrc() {
+            kill('adrc');
+            const levels = ['L1', 'L2', 'L3', 'L4'];
+            const avg25 = levels.map(l => { const rs = DATA.resources.filter(r => r.rateLevel === l); return rs.length ? Math.round(rs.reduce((s, r) => s + (r.adrc25 || 0), 0) / rs.length) : 0; });
+            const avg26 = levels.map(l => { const rs = DATA.resources.filter(r => r.rateLevel === l); return rs.length ? Math.round(rs.reduce((s, r) => s + (r.adrc26 || 0), 0) / rs.length) : 0; });
+            charts['adrc'] = new Chart(document.getElementById('c-adrc'), {
+                type: 'bar',
+                data: { labels: levels, datasets: [{ label: '2025', data: avg25, backgroundColor: 'rgba(99,102,241,.75)', borderRadius: 5 }, { label: '2026', data: avg26, backgroundColor: 'rgba(139,92,246,.75)', borderRadius: 5 }] },
+                options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { callback: v => '€' + v, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { font: { size: 11, weight: '600' } }, grid: { display: false } } } }
+            });
+        }
+
+        function top5() {
+            kill('top5');
+            const y = activeYear;
+            const totals = DATA.resources.map(r => ({
+                r, total: DATA.bookings.filter(b => b.resourceId === r.id && b.year === y && b.type === 'plan').reduce((s, b) => s + b.days, 0)
+            })).sort((a, b) => b.total - a.total).slice(0, 5);
+            charts['top5'] = new Chart(document.getElementById('c-top5'), {
+                type: 'bar',
+                data: {
+                    labels: MONTHS,
+                    datasets: totals.map((t, i) => ({
+                        label: t.r.name.split(' ').slice(0, 2).join(' '),
+                        data: Array.from({ length: 12 }, (_, m) => DATA.bookings.filter(b => b.resourceId === t.r.id && b.month === m + 1 && b.year === y && b.type === 'plan').reduce((s, b) => s + b.days, 0)),
+                        backgroundColor: PAL[i] + 'cc', borderRadius: 3, borderSkipped: false
+                    }))
+                },
+                options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { font: { size: 10 } }, grid: { display: false } } } }
+            });
+        }
+
+        function projList() {
+            const total = DATA.projects.reduce((s, p) => s + (p.budget || 0), 0);
+            const sorted = [...DATA.projects].sort((a, b) => (b.budget || 0) - (a.budget || 0));
+            document.getElementById('proj-list').innerHTML = sorted.map((p, i) => {
+                const pct = total ? Math.round((p.budget / total) * 100) : 0;
+                return `<div class="proj-item">
+            <div class="proj-dot" style="background:${PAL[i % PAL.length]}; box-shadow:0 0 6px ${PAL[i % PAL.length]}60"></div>
+            <div style="flex:1;min-width:0">
+                <div class="proj-name" title="${p.name}">${p.name}</div>
+                <div class="proj-cli">${p.client}</div>
+            </div>
+            <div class="proj-track"><div class="proj-fill" style="width:${pct}%;background:${PAL[i % PAL.length]}"></div></div>
+            <div class="proj-pct">${pct}%</div>
+        </div>`;
+            }).join('');
+        }
+
+        refreshAll();
+    </script>
+</body>
+
+</html>

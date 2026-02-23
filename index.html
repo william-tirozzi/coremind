@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSFC — Staffing Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #07080f;
+            --panel: rgba(14, 17, 32, 0.85);
+            --glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.07);
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
+            --text: rgba(255, 255, 255, 0.85);
+            --muted: rgba(255, 255, 255, 0.35);
+            --topnav-h: 60px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif !important;
+            background: var(--bg) !important;
+            color: var(--text) !important;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-top: var(--topnav-h);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 700px 500px at 15% 0%, rgba(99, 102, 241, .12) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 600px at 90% 100%, rgba(139, 92, 246, .10) 0%, transparent 70%);
+        }
+
+        /* ============ TOPNAV ============ */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topnav-h);
+            z-index: 1040;
+            background: rgba(7, 8, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 24px;
+        }
+
+        .topnav::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5) 30%, rgba(139, 92, 246, 0.5) 70%, transparent);
+        }
+
+        .tn-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .tn-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+            box-shadow: 0 0 14px rgba(99, 102, 241, .45);
+            flex-shrink: 0;
+        }
+
+        .tn-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .tn-ver {
+            font-size: 0.6rem;
+            color: var(--muted);
+        }
+
+        .tn-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .tn-link {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 0.83rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+
+        .tn-link i {
+            font-size: 0.9rem;
+        }
+
+        .tn-link:hover {
+            background: var(--glass);
+            color: var(--text);
+        }
+
+        .tn-link.active {
+            background: rgba(99, 102, 241, .14);
+            color: #a5b4fc;
+            font-weight: 600;
+        }
+
+        .tn-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .tn-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+        }
+
+        .tn-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .tn-uname {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .tn-logout {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: color .15s;
+            font-size: 1rem;
+        }
+
+        .tn-logout:hover {
+            color: #f87171;
+        }
+
+        /* Year selector in nav */
+        .year-select-nav {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .year-select-nav option {
+            background: #0e1120;
+        }
+
+        /* ============ CONTENT AREA ============ */
+        .content {
+            padding: 28px 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ KPI ROW ============ */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .kpi {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: border-color .2s, transform .2s;
+        }
+
+        .kpi:hover {
+            border-color: rgba(99, 102, 241, .3);
+            transform: translateY(-2px);
+        }
+
+        .kpi-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-val {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: white;
+        }
+
+        .kpi-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+        }
+
+        /* ============ TABS ============ */
+        .dark-tabs {
+            display: flex;
+            gap: 2px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0;
+        }
+
+        .dark-tab {
+            padding: 10px 20px;
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 2px solid transparent;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: -1px;
+        }
+
+        .dark-tab:hover {
+            color: var(--text);
+        }
+
+        .dark-tab.active {
+            color: #a5b4fc;
+            border-bottom-color: #6366f1;
+            font-weight: 600;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.show {
+            display: block;
+        }
+
+        /* ============ GLASS CARD ============ */
+        .glass-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .glass-card.tab-top {
+            border-radius: 0 16px 16px 16px;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        }
+
+        .card-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 0.87rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* ============ TABLE DARK ============ */
+        .dark-table-wrap {
+            overflow-x: auto;
+        }
+
+        .dark-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .dark-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            white-space: nowrap;
+        }
+
+        .dark-table th.text-center,
+        .dark-table td.text-center {
+            text-align: center;
+        }
+
+        .dark-table th.text-end,
+        .dark-table td.text-end {
+            text-align: right;
+        }
+
+        .dark-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .dark-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ============ FILTER BAR ============ */
+        .filter-bar {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .dark-input,
+        .dark-select-sm {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 7px 11px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color .15s;
+        }
+
+        .dark-input::placeholder {
+            color: var(--muted);
+        }
+
+        .dark-select-sm {
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.35)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 26px;
+            cursor: pointer;
+        }
+
+        .dark-select-sm option {
+            background: #0e1120;
+            color: var(--text);
+        }
+
+        .dark-input:focus,
+        .dark-select-sm:focus {
+            border-color: rgba(99, 102, 241, .5);
+        }
+
+        .btn-sm-dark {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-sm-dark:hover {
+            color: var(--text);
+            border-color: rgba(99, 102, 241, .3);
+        }
+
+        .btn-primary-dark {
+            background: var(--indigo);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 12px rgba(99, 102, 241, .3);
+        }
+
+        .btn-primary-dark:hover {
+            background: #5254cc;
+        }
+
+        /* ============ RESOURCE CARDS ============ */
+        .resource-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+            padding: 18px;
+        }
+
+        .res-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all .15s;
+        }
+
+        .res-card:hover {
+            border-color: rgba(99, 102, 241, .3);
+            transform: translateY(-2px);
+        }
+
+        .res-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .res-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .res-skill {
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        .res-badge {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+        }
+
+        /* ============ BADGE ============ */
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .badge-indigo {
+            background: rgba(99, 102, 241, .18);
+            color: #a5b4fc;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, .18);
+            color: #6ee7b7;
+        }
+
+        .badge-amber {
+            background: rgba(245, 158, 11, .18);
+            color: #fcd34d;
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* ============ MODAL ============ */
+        .modal-content {
+            background: #0e1120;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border);
+        }
+
+        .modal-title {
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-close {
+            filter: invert(1) opacity(0.4);
+        }
+
+        .form-control,
+        .form-control:focus {
+            background: var(--glass) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-text {
+            color: var(--muted) !important;
+        }
+
+        .btn-secondary {
+            background: var(--glass) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+        }
+
+        .btn-success {
+            background: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+
+        .table-sm.table-bordered td,
+        .table-sm.table-bordered th {
+            border-color: var(--border) !important;
+            color: var(--text) !important;
+            background: transparent !important;
+        }
+
+        .table-light {
+            background: rgba(255, 255, 255, 0.04) !important;
+            color: var(--muted) !important;
+        }
+
+        /* count label */
+        .count-label {
+            padding: 10px 14px;
+            font-size: 0.75rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ============ DAY-VIEW ============ */
+        .dv-datebar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dv-nav-btn {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all .15s;
+            flex-shrink: 0;
+        }
+
+        .dv-nav-btn:hover {
+            border-color: rgba(99, 102, 241, .4);
+            color: #a5b4fc;
+        }
+
+        .dv-date-input {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            color-scheme: dark;
+        }
+
+        .dv-date-input:focus {
+            border-color: rgba(99, 102, 241, .5);
+        }
+
+        .dv-weekday-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            background: rgba(99, 102, 241, .12);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .dv-holiday-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fda4af;
+            background: rgba(244, 63, 94, .12);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .dv-body {
+            padding: 0;
+        }
+
+        .dv-no-work {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 64px 24px;
+            gap: 12px;
+            color: var(--muted);
+        }
+
+        .dv-no-work i {
+            font-size: 2.5rem;
+            opacity: 0.4;
+        }
+
+        .dv-no-work span {
+            font-size: 0.9rem;
+        }
+
+        .dv-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background .15s;
+        }
+
+        .dv-row:hover {
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .dv-row:last-child {
+            border-bottom: none;
+        }
+
+        .dv-res-name {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .dv-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .dv-name-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dv-skill-text {
+            font-size: 0.68rem;
+            color: var(--muted);
+        }
+
+        .dv-right {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dv-bar {
+            display: flex;
+            height: 22px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, .05);
+            width: 100%;
+        }
+
+        .dv-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.85);
+            overflow: hidden;
+            white-space: nowrap;
+            transition: filter .15s;
+            cursor: default;
+        }
+
+        .dv-segment:hover {
+            filter: brightness(1.15);
+        }
+
+        .dv-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .dv-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            color: var(--muted);
+        }
+
+        .dv-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .dv-header-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 14px;
+            padding: 8px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .dv-header-row span {
+            font-size: 0.67rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--muted);
+        }
+
+        .dv-summary-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, .02);
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        /* ============ PIANO GIORNALIERO (daily grid) ============ */
+        .dg-wrap {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 65vh;
+        }
+
+        .dg-table {
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 100%;
+            white-space: nowrap;
+        }
+
+        /* Sticky header row */
+        .dg-th {
+            padding: 7px 4px;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            background: rgba(7, 8, 15, 0.98);
+            position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+
+        /* Sticky first column */
+        .dg-sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background: #0b0d1a;
+            border-right: 1px solid var(--border);
+            min-width: 210px;
+            max-width: 210px;
+        }
+
+        /* Top-left corner: highest z */
+        .dg-th.dg-sticky-col {
+            z-index: 4;
+        }
+
+        .dg-day-header {
+            min-width: 44px;
+            cursor: default;
+        }
+
+        .dg-dn {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .7);
+            line-height: 1.2;
+        }
+
+        .dg-dw {
+            font-size: 0.58rem;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        /* Cells */
+        .dg-cell {
+            padding: 5px 3px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            min-width: 44px;
+            vertical-align: middle;
+        }
+
+        /* Resource header row */
+        .dg-res-header>td {
+            background: rgba(99, 102, 241, .06);
+        }
+
+        .dg-res-header:hover>td {
+            background: rgba(99, 102, 241, .1);
+        }
+
+        .dg-res-name-cell {
+            padding: 7px 12px;
+            cursor: pointer;
+        }
+
+        .dg-proj-name-cell,
+        .dg-bench-name-cell {
+            padding: 5px 12px;
+        }
+
+        .dg-bench-row>td {
+            background: rgba(255, 255, 255, 0.012);
+        }
+
+        /* Weekend / holiday columns */
+        .dg-weekend {
+            background: rgba(0, 0, 0, 0.22) !important;
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        /* Today column highlight */
+        .dg-today-col {
+            background: rgba(99, 102, 241, .07) !important;
+            border-left: 2px solid rgba(99, 102, 241, .45) !important;
+        }
+
+        .dg-th.dg-today-col .dg-dn {
+            color: #a5b4fc;
+        }
+
+        /* Editable cells */
+        .dg-editable {
+            cursor: pointer;
+        }
+
+        .dg-editable:hover {
+            background: rgba(99, 102, 241, .14);
+        }
+
+        /* Value styles — aligned to staffing grid days-* classes */
+        /* Future cells (planned): dim the days-* values slightly */
+        .dg-future .days-high,
+        .dg-future .days-medium,
+        .dg-future .days-low {
+            opacity: 0.5;
+            font-weight: 500;
+        }
+
+        /* Today column: keep full-brightness values */
+        .dg-today-col .days-high,
+        .dg-today-col .days-medium,
+        .dg-today-col .days-low {
+            opacity: 1 !important;
+        }
+
+        /* Resource total cell value */
+        .dg-total-val {
+            font-size: .75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .55);
+        }
+
+        .dg-weekend-mark {
+            color: rgba(255, 255, 255, .09);
+            font-size: .7rem;
+        }
+
+        /* Row styles — inherit from staffing grid classes in style.css */
+        /* res-group-header, proj-sub-row, absence-sub-row already defined there */
+        /* Override sticky-col backgrounds to match row tint */
+        .dg-res-header>.dg-sticky-col {
+            background: rgba(99, 102, 241, .08);
+        }
+
+        .dg-proj-row>.dg-sticky-col {
+            background: rgba(0, 0, 0, .06);
+        }
+
+        .dg-bench-row>.dg-sticky-col {
+            background: rgba(255, 255, 255, .012);
+        }
+
+        /* Inline editor input */
+        .dg-cell-input {
+            width: 38px;
+            background: rgba(99, 102, 241, .22);
+            border: 1px solid #6366f1;
+            border-radius: 4px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 2px 3px;
+            outline: none;
+        }
+
+        /* Month navigator */
+        .dg-month-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .dg-month-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .dg-legend-chips {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .dg-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.68rem;
+            color: var(--muted);
+        }
+
+        .dg-chip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======= TOPNAV ======= -->
+    <header class="topnav">
+        <a class="tn-brand" href="home.html">
+            <div class="tn-mark"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div>
+                <div class="tn-name">PSFC</div>
+                <div class="tn-ver">Project Staffing & Financial Control</div>
+            </div>
+        </a>
+        <nav class="tn-links">
+            <a class="tn-link" href="home.html"><i class="bi bi-house-fill"></i> Dashboard</a>
+            <a class="tn-link active" href="index.html"><i class="bi bi-people-fill"></i> Staffing Grid</a>
+            <a class="tn-link" href="control.html"><i class="bi bi-graph-up-arrow"></i> Project Control</a>
+            <a class="tn-link" href="importer.html"><i class="bi bi-cloud-upload-fill"></i> Import Excel</a>
+        </nav>
+        <div class="tn-right">
+            <select class="year-select-nav" id="filter-year">
+                <option value="2025" selected>2025</option>
+                <option value="2026">2026</option>
+            </select>
+            <button class="btn-primary-dark" id="btn-export"><i class="bi bi-download"></i> Export</button>
+            <div class="tn-user">
+                <div class="tn-avatar" id="sb-av">DU</div>
+                <div>
+                    <div class="tn-uname" id="sb-name">Demo User</div>
+                </div>
+                <button class="tn-logout" title="Logout" onclick="logout()"><i
+                        class="bi bi-box-arrow-right"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- KPI Row -->
+        <div class="kpi-row">
+            <div class="kpi">
+                <div class="kpi-icon" style="background:rgba(99,102,241,.18);color:#a5b4fc"><i
+                        class="bi bi-people-fill"></i></div>
+                <div>
+                    <div class="kpi-val" id="stat-resources">—</div>
+                    <div class="kpi-label">Risorse Totali</div>
+                </div>
+            </div>
+            <div class="kpi">
+                <div class="kpi-icon" style="background:rgba(16,185,129,.18);color:#6ee7b7"><i
+                        class="bi bi-folder2-open"></i></div>
+                <div>
+                    <div class="kpi-val" id="stat-projects">—</div>
+                    <div class="kpi-label">Progetti Attivi</div>
+                </div>
+            </div>
+            <div class="kpi">
+                <div class="kpi-icon" style="background:rgba(245,158,11,.18);color:#fcd34d"><i
+                        class="bi bi-calendar3"></i></div>
+                <div>
+                    <div class="kpi-val" id="stat-allocated">—</div>
+                    <div class="kpi-label">Ore Pianificate (Anno)</div>
+                </div>
+            </div>
+            <div class="kpi">
+                <div class="kpi-icon" style="background:rgba(6,182,212,.18);color:#67e8f9"><i
+                        class="bi bi-shield-check"></i></div>
+                <div>
+                    <div class="kpi-val">
+                        <span class="badge badge-green" id="stat-status">OK</span>
+                    </div>
+                    <div class="kpi-label">Stato Sistema</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="dark-tabs">
+            <button class="dark-tab active" data-tab="tab-staffing"><i class="bi bi-grid-3x3"></i> Staffing
+                Grid</button>
+            <button class="dark-tab" data-tab="tab-db"><i class="bi bi-database"></i> DB Progetti</button>
+            <button class="dark-tab" data-tab="tab-risorse"><i class="bi bi-person-badge"></i> Risorse</button>
+            <button class="dark-tab" data-tab="tab-dayview"><i class="bi bi-calendar-day"></i> Vista
+                Giornaliera</button>
+        </div>
+
+        <!-- Tab: Staffing Grid -->
+        <div class="tab-pane show" id="tab-staffing">
+            <div class="glass-card tab-top">
+                <div class="card-head">
+                    <div class="card-title" id="staffing-card-title">Allocazione Mensile per Risorsa — Piano (giorni)
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <!-- Mensile / Giornaliero toggle -->
+                        <div style="display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;"
+                            id="staffing-period-toggle">
+                            <button class="view-mode-btn active" id="btn-period-monthly"
+                                style="padding:4px 14px;font-size:0.75rem;font-weight:600;border:none;cursor:pointer;background:rgba(99,102,241,0.25);color:#a5b4fc;transition:.15s;">
+                                <i class="bi bi-calendar3"></i> Mensile
+                            </button>
+                            <button class="view-mode-btn" id="btn-period-daily"
+                                style="padding:4px 14px;font-size:0.75rem;font-weight:600;border:none;border-left:1px solid rgba(255,255,255,0.08);cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);transition:.15s;">
+                                <i class="bi bi-table"></i> Giornaliero
+                            </button>
+                        </div>
+                        <button class="btn-sm-dark" id="btn-export-samantha" style="">
+                            <i class="bi bi-file-earmark-arrow-down"></i> Export Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Monthly view controls (hidden when daily is active) -->
+                <div id="staffing-monthly-controls">
+                    <div style="display:flex;align-items:center;gap:8px;margin:0 0 10px 0;">
+                        <span style="font-size:0.75rem;color:rgba(255,255,255,0.4);font-weight:500;">Visualizza:</span>
+                        <div style="display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;"
+                            id="staffing-view-toggle">
+                            <button class="view-mode-btn active" data-mode="days"
+                                style="padding:4px 12px;font-size:0.75rem;font-weight:600;border:none;cursor:pointer;background:rgba(99,102,241,0.25);color:#a5b4fc;transition:.15s;">
+                                Giorni
+                            </button>
+                            <button class="view-mode-btn" data-mode="hours_month"
+                                style="padding:4px 12px;font-size:0.75rem;font-weight:600;border:none;border-left:1px solid rgba(255,255,255,0.08);cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);transition:.15s;">
+                                Ore/mese
+                            </button>
+                            <button class="view-mode-btn" data-mode="hours_day"
+                                style="padding:4px 12px;font-size:0.75rem;font-weight:600;border:none;border-left:1px solid rgba(255,255,255,0.08);cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);transition:.15s;">
+                                h/giorno
+                            </button>
+                        </div>
+                        <span style="font-size:0.7rem;color:rgba(255,255,255,0.25);margin-left:4px;"
+                            id="staffing-view-hint">1 giorno = 8h</span>
+                    </div>
+                    <div class="dark-table-wrap">
+                        <table class="dark-table" id="staffing-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:180px;">Risorsa / Skills</th>
+                                    <th class="text-center">Gen</th>
+                                    <th class="text-center">Feb</th>
+                                    <th class="text-center">Mar</th>
+                                    <th class="text-center">Apr</th>
+                                    <th class="text-center">Mag</th>
+                                    <th class="text-center">Giu</th>
+                                    <th class="text-center">Lug</th>
+                                    <th class="text-center">Ago</th>
+                                    <th class="text-center">Set</th>
+                                    <th class="text-center">Ott</th>
+                                    <th class="text-center">Nov</th>
+                                    <th class="text-center">Dic</th>
+                                    <th class="text-center">Tot</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffing-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Daily grid (hidden until Giornaliero is selected) -->
+                <div id="staffing-daily-wrap" style="display:none;">
+                    <div class="dg-month-nav"
+                        style="padding:8px 0 12px 0;border-top:1px solid var(--border);margin-top:8px;">
+                        <button class="dv-nav-btn" id="dg-prev" title="Mese precedente"><i
+                                class="bi bi-chevron-left"></i></button>
+                        <span class="dg-month-label" id="dg-month-label">Febbraio 2026</span>
+                        <button class="dv-nav-btn" id="dg-next" title="Mese successivo"><i
+                                class="bi bi-chevron-right"></i></button>
+                        <div class="dg-legend-chips">
+                            <span class="dg-chip"><span class="dg-chip-dot"
+                                    style="background:rgba(255,255,255,.7);"></span>Passato</span>
+                            <span class="dg-chip"><span class="dg-chip-dot"
+                                    style="background:rgba(255,255,255,.35);"></span>Pianificato</span>
+                            <span class="dg-chip"><span class="dg-chip-dot"
+                                    style="background:rgba(99,102,241,.6);"></span>Oggi</span>
+                            <span class="dg-chip"><span class="dg-chip-dot"
+                                    style="background:rgba(255,255,255,.08);"></span>Weekend</span>
+                            <span style="font-size:0.68rem;color:var(--muted);margin-left:4px;"><i
+                                    class="bi bi-pencil-square" style="margin-right:3px;"></i>Click per
+                                modificare</span>
+                        </div>
+                    </div>
+                    <div class="dg-wrap" id="daily-grid-wrap"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: DB Progetti -->
+        <div class="tab-pane" id="tab-db">
+            <div class="glass-card tab-top">
+                <div class="filter-bar">
+                    <input type="text" class="dark-input" id="db-search"
+                        placeholder="🔍  Cerca progetto, cliente, WBS..." style="min-width:220px;">
+                    <select class="dark-select-sm" id="filter-market">
+                        <option value="">Market Segment</option>
+                    </select>
+                    <select class="dark-select-sm" id="filter-billability">
+                        <option value="">Billability</option>
+                    </select>
+                    <select class="dark-select-sm" id="filter-pm">
+                        <option value="">Project Manager</option>
+                    </select>
+                    <select class="dark-select-sm" id="filter-type">
+                        <option value="">Tipo</option>
+                        <option value="EXTERNAL">External</option>
+                        <option value="INTERNAL">Internal</option>
+                    </select>
+                    <button class="btn-sm-dark" id="btn-clear-filters"><i class="bi bi-x-lg"></i> Reset</button>
+                </div>
+                <div class="dark-table-wrap">
+                    <table class="dark-table">
+                        <thead>
+                            <tr>
+                                <th>WBS / Codice</th>
+                                <th>Nome Progetto</th>
+                                <th>Cliente</th>
+                                <th>Project Manager</th>
+                                <th>Market Segment</th>
+                                <th>Billability</th>
+                                <th>Tipo</th>
+                                <th class="text-end">Budget (€)</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="db-projects-body"></tbody>
+                    </table>
+                </div>
+                <div class="count-label" id="db-count-label"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Risorse -->
+        <div class="tab-pane" id="tab-risorse">
+            <div class="glass-card tab-top">
+                <div class="card-head">
+                    <div class="card-title">Anagrafica Risorse — Tariffe ADRC</div>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" class="dark-input" id="risorse-search" placeholder="🔍  Cerca..."
+                            style="width:180px;">
+                        <select class="dark-select-sm" id="filter-skill" style="width:160px;">
+                            <option value="">Skills Area</option>
+                        </select>
+                        <select class="dark-select-sm" id="filter-level" style="width:120px;">
+                            <option value="">Rate Level</option>
+                            <option value="L1">L1</option>
+                            <option value="L2">L2</option>
+                            <option value="L3">L3</option>
+                            <option value="L4">L4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="resource-cards" id="risorse-cards-container"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Vista Giornaliera -->
+        <div class="tab-pane" id="tab-dayview">
+            <div class="glass-card tab-top">
+                <!-- Date picker bar -->
+                <div class="dv-datebar">
+                    <button class="dv-nav-btn" id="dv-prev"><i class="bi bi-chevron-left"></i></button>
+                    <input type="date" class="dv-date-input" id="dv-date">
+                    <button class="dv-nav-btn" id="dv-next"><i class="bi bi-chevron-right"></i></button>
+                    <span class="dv-weekday-label" id="dv-weekday-label"></span>
+                    <span class="dv-holiday-badge" id="dv-holiday-badge" style="display:none;"></span>
+                    <span style="margin-left:auto;font-size:0.75rem;color:var(--muted);">Ore basate su proporzione
+                        mensile &bull; 1 giorno = 8h</span>
+                </div>
+                <!-- Resource rows -->
+                <div class="dv-header-row">
+                    <span>Risorsa</span>
+                    <span>Allocazione (8h disponibili)</span>
+                </div>
+                <div class="dv-body" id="dayview-body"></div>
+                <div class="dv-summary-bar" id="dv-summary-bar"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Piano Giornaliero -->
+
+    </div>
+
+    <!-- Import Modal (TSV legacy) -->
+    <div class="modal fade" id="importModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Dati (Incolla da Excel)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="import-step-1">
+                        <div class="mb-3">
+                            <label class="form-label" style="color:var(--muted);">Incolla dati da Excel (Resource,
+                                Project, Gen...Dic)</label>
+                            <textarea class="form-control font-monospace" id="paste-input" rows="10"
+                                placeholder="Incolla le celle direttamente da Excel..."></textarea>
+                            <div class="form-text">Le intestazioni devono contenere "Resource"/"Name" e "Project"/"WBS".
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-primary" id="btn-parse-data">Analizza &rarr;</button>
+                        </div>
+                    </div>
+                    <div id="import-step-2" class="d-none">
+                        <div class="alert alert-info py-2 small">
+                            Parsate <strong id="lbl-row-count">0</strong> righe. Risolvi eventuali warning.
+                        </div>
+                        <div class="table-responsive" style="max-height:400px; overflow-y:auto">
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Nome Originale</th>
+                                        <th>Risorsa Mappata</th>
+                                        <th>Progetto</th>
+                                        <th>Giorni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="review-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button type="button" class="btn btn-secondary me-2" id="btn-back-step1">&larr;
+                                Indietro</button>
+                            <button type="button" class="btn btn-success" id="btn-confirm-import">Conferma
+                                Import</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/export.js"></script>
+    <script src="assets/js/importer.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        /* ========== AUTH ========== */
+        const user = JSON.parse(sessionStorage.getItem('psfc_user') || 'null');
+        if (!user) location.href = 'login.html';
+        else {
+            const name = user.name || user.email;
+            document.getElementById('sb-av').textContent = name.slice(0, 2).toUpperCase();
+            document.getElementById('sb-name').textContent = name;
+        }
+        function logout() { sessionStorage.removeItem('psfc_user'); location.href = 'login.html'; }
+
+        /* ========== TABS ========== */
+        document.querySelectorAll('.dark-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.dark-tab').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('show');
+            });
+        });
+    </script>
+</body>
+
+</html>

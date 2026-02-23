@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSFC — Import Excel Planning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #07080f;
+            --panel: rgba(14, 17, 32, 0.85);
+            --glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.07);
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
+            --text: rgba(255, 255, 255, 0.85);
+            --muted: rgba(255, 255, 255, 0.35);
+            --topnav-h: 60px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif !important;
+            background: var(--bg) !important;
+            color: var(--text) !important;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-top: var(--topnav-h);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 700px 500px at 15% 0%, rgba(99, 102, 241, .12) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 600px at 90% 100%, rgba(139, 92, 246, .10) 0%, transparent 70%);
+        }
+
+        /* ============ TOPNAV ============ */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topnav-h);
+            z-index: 1040;
+            background: rgba(7, 8, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 24px;
+        }
+
+        .topnav::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5) 30%, rgba(139, 92, 246, 0.5) 70%, transparent);
+        }
+
+        .tn-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+        .tn-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+            box-shadow: 0 0 14px rgba(99, 102, 241, .45);
+            flex-shrink: 0;
+        }
+
+        .tn-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .tn-ver {
+            font-size: 0.6rem;
+            color: var(--muted);
+        }
+
+        .tn-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .tn-link {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 0.83rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+
+        .tn-link i {
+            font-size: 0.9rem;
+        }
+
+        .tn-link:hover {
+            background: var(--glass);
+            color: var(--text);
+        }
+
+        .tn-link.active {
+            background: rgba(99, 102, 241, .14);
+            color: #a5b4fc;
+            font-weight: 600;
+        }
+
+        .tn-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            flex-shrink: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+        }
+
+        .tn-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .tn-uname {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .tn-logout {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: color .15s;
+            font-size: 1rem;
+        }
+
+        .tn-logout:hover {
+            color: #f87171;
+        }
+
+        /* ============ CONTENT ============ */
+        .content {
+            padding: 28px;
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ============ PAGE HEADER ============ */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .page-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            flex-shrink: 0;
+            background: rgba(99, 102, 241, .18);
+            color: #a5b4fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: white;
+        }
+
+        .page-sub {
+            font-size: 0.84rem;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .page-sub code {
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        /* ============ STEPPER ============ */
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            transition: all .3s;
+        }
+
+        .step.active .step-circle {
+            background: var(--indigo);
+            border-color: var(--indigo);
+            color: white;
+            box-shadow: 0 0 12px rgba(99, 102, 241, .4);
+        }
+
+        .step.done .step-circle {
+            background: rgba(16, 185, 129, .2);
+            border-color: #10b981;
+            color: #6ee7b7;
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            transition: color .3s;
+        }
+
+        .step.active .step-label {
+            color: #a5b4fc;
+        }
+
+        .step.done .step-label {
+            color: #6ee7b7;
+        }
+
+        .step-bar {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            margin: 0 16px;
+            min-width: 40px;
+        }
+
+        /* ============ GLASS CARD ============ */
+        .glass-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            margin-bottom: 16px;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        }
+
+        .card-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body-pad {
+            padding: 20px;
+        }
+
+        /* ============ DROP ZONE ============ */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 14px;
+            transition: all .2s;
+            cursor: pointer;
+            margin: 4px;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--indigo);
+            background: rgba(99, 102, 241, .05);
+        }
+
+        .drop-zone-inner {
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .drop-zone-icon {
+            font-size: 3rem;
+            color: #6366f1;
+            opacity: 0.7;
+            display: block;
+        }
+
+        /* ============ BTNS ============ */
+        .btn-primary-dark {
+            background: var(--indigo);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 16px rgba(99, 102, 241, .3);
+        }
+
+        .btn-primary-dark:hover {
+            background: #5254cc;
+            box-shadow: 0 0 22px rgba(99, 102, 241, .5);
+        }
+
+        .btn-outline-dark {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 10px;
+            padding: 8px 18px;
+            font-size: 0.83rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline-dark:hover {
+            border-color: rgba(99, 102, 241, .4);
+            color: var(--text);
+        }
+
+        .btn-success-dark {
+            background: rgba(16, 185, 129, .85);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-success-dark:hover {
+            background: #059669;
+        }
+
+        .btn-cancel-dark {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-size: 0.83rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel-dark:hover {
+            color: var(--text);
+            border-color: rgba(255, 255, 255, .15);
+        }
+
+        .btn-teal-dark {
+            background: rgba(20, 184, 166, .15);
+            color: #2dd4bf;
+            border: 1px solid rgba(20, 184, 166, .3);
+            border-radius: 10px;
+            padding: 9px 18px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-teal-dark:hover {
+            background: rgba(20, 184, 166, .25);
+            border-color: rgba(20, 184, 166, .5);
+            color: #5eead4;
+        }
+
+        /* File choose btn */
+        label.btn-outline-dark {
+            cursor: pointer;
+        }
+
+        /* ============ ALERTS ============ */
+        .alert-dark-success {
+            background: rgba(16, 185, 129, .1);
+            border: 1px solid rgba(16, 185, 129, .3);
+            color: #6ee7b7;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.83rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-dark-info {
+            background: rgba(6, 182, 212, .08);
+            border: 1px solid rgba(6, 182, 212, .25);
+            color: #67e8f9;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.81rem;
+        }
+
+        .alert-dark-warn {
+            background: rgba(245, 158, 11, .08);
+            border: 1px solid rgba(245, 158, 11, .25);
+            color: #fcd34d;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 0.83rem;
+        }
+
+        .alert-dark-danger {
+            background: rgba(244, 63, 94, .08);
+            border: 1px solid rgba(244, 63, 94, .25);
+            color: #fda4af;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.83rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ============ SHEET TAGS ============ */
+        .sheet-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: rgba(99, 102, 241, .15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, .25);
+        }
+
+        /* ============ TABS ============ */
+        .dark-tabs {
+            display: flex;
+            gap: 2px;
+            padding: 14px 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dark-tab {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+            border-bottom: 2px solid transparent;
+            transition: all .15s;
+            margin-bottom: -1px;
+        }
+
+        .dark-tab:hover {
+            color: var(--text);
+        }
+
+        .dark-tab.active {
+            color: #a5b4fc;
+            border-bottom-color: #6366f1;
+            font-weight: 600;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.show {
+            display: block;
+        }
+
+        /* ============ PREVIEW TABLE ============ */
+        .preview-wrap {
+            overflow: auto;
+            max-height: 380px;
+        }
+
+        .dark-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .dark-table th {
+            padding: 9px 12px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+
+        .dark-table td {
+            padding: 9px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .dark-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-footer {
+            padding: 10px 14px;
+            font-size: 0.75rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ============ SUMMARY CARDS ============ */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .summary-card h6 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            margin-bottom: 8px;
+        }
+
+        .summary-key {
+            color: var(--muted);
+        }
+
+        .summary-val {
+            font-weight: 700;
+        }
+
+        .switch-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .dark-switch {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .dark-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .dark-switch-slider {
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .dark-switch-slider::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            left: 2px;
+            top: 2px;
+            background: var(--muted);
+            border-radius: 50%;
+            transition: all .2s;
+        }
+
+        .dark-switch input:checked+.dark-switch-slider {
+            background: rgba(99, 102, 241, .4);
+            border-color: var(--indigo);
+        }
+
+        .dark-switch input:checked+.dark-switch-slider::before {
+            transform: translateX(16px);
+            background: #a5b4fc;
+        }
+
+        /* ============ DONE CIRCLE ============ */
+        .done-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: rgba(16, 185, 129, .15);
+            border: 2px solid #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: #6ee7b7;
+            box-shadow: 0 0 30px rgba(16, 185, 129, .25);
+        }
+
+        /* ============ SPINNER ============ */
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(99, 102, 241, .2);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============ BADGES ============ */
+        .badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .badge-indigo {
+            background: rgba(99, 102, 241, .18);
+            color: #a5b4fc;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, .18);
+            color: #6ee7b7;
+        }
+
+        .badge-amber {
+            background: rgba(245, 158, 11, .18);
+            color: #fcd34d;
+        }
+
+        .badge-gray {
+            background: rgba(255, 255, 255, .08);
+            color: var(--muted);
+        }
+
+        /* ============ EXPECTED FORMAT TABLE ============ */
+        .format-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .format-table th {
+            padding: 9px 12px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .format-table td {
+            padding: 9px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .format-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .format-table code {
+            background: rgba(99, 102, 241, .12);
+            color: #a5b4fc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .12);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======= TOPNAV ======= -->
+    <header class="topnav">
+        <a class="tn-brand" href="home.html">
+            <div class="tn-mark"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <div>
+                <div class="tn-name">PSFC</div>
+                <div class="tn-ver">Project Staffing & Financial Control</div>
+            </div>
+        </a>
+        <nav class="tn-links">
+            <a class="tn-link" href="home.html"><i class="bi bi-house-fill"></i> Dashboard</a>
+            <a class="tn-link" href="index.html"><i class="bi bi-people-fill"></i> Staffing Grid</a>
+            <a class="tn-link" href="control.html"><i class="bi bi-graph-up-arrow"></i> Project Control</a>
+            <a class="tn-link active" href="importer.html"><i class="bi bi-cloud-upload-fill"></i> Import Excel</a>
+        </nav>
+        <div class="tn-user">
+            <div class="tn-avatar" id="sb-av">DU</div>
+            <div>
+                <div class="tn-uname" id="sb-name">Demo User</div>
+            </div>
+            <button class="tn-logout" title="Logout" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div class="page-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+            <div style="flex:1;">
+                <div class="page-title">Import Planning Excel</div>
+                <div class="page-sub">Carica il file <code>NOME CLIENTE_Planning.xlsx</code> per aggiornare risorse,
+                    progetti e allocazioni</div>
+            </div>
+            <button class="btn-teal-dark" onclick="downloadTemplate()"
+                title="Scarica il template Excel con la struttura corretta da compilare">
+                <i class="bi bi-file-earmark-arrow-down"></i> Scarica Template
+            </button>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper" id="stepper">
+            <div class="step active" id="step-dot-1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Upload File</div>
+            </div>
+            <div class="step-bar"></div>
+            <div class="step" id="step-dot-2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Preview Sheet</div>
+            </div>
+            <div class="step-bar"></div>
+            <div class="step" id="step-dot-3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Conferma Import</div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 1: Upload ===== -->
+        <div id="step-1">
+            <div class="glass-card" style="max-width:680px;margin:0 auto 16px;">
+                <div class="card-body-pad">
+                    <!-- Drop Zone -->
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="drop-zone-inner" id="drop-zone-inner">
+                            <i class="bi bi-cloud-arrow-up drop-zone-icon"></i>
+                            <h5 style="margin-top:14px;margin-bottom:6px;color:white;font-weight:700;">Trascina il file
+                                .xlsx qui</h5>
+                            <p style="color:var(--muted);font-size:0.83rem;margin-bottom:18px;">oppure clicca per
+                                sfogliare</p>
+                            <label class="btn-outline-dark" for="file-input">
+                                <i class="bi bi-folder2-open"></i> Scegli File
+                            </label>
+                            <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none;">
+                        </div>
+                        <div id="drop-zone-loading" style="text-align:center;padding:32px;display:none;">
+                            <div class="spinner"></div>
+                            <p style="color:var(--muted);margin:0;">Analisi del file in corso...</p>
+                        </div>
+                    </div>
+
+                    <!-- File Info -->
+                    <div id="file-info" style="display:none;margin-top:16px;">
+                        <div class="alert-dark-success" style="margin-bottom:14px;">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>File caricato: <strong id="file-name-label"></strong> — <span
+                                    id="file-size-label"></span></span>
+                        </div>
+                        <div
+                            style="font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">
+                            Sheet rilevati</div>
+                        <div id="sheet-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+                        <div class="alert-dark-info" style="margin-bottom:14px;">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Il foglio <strong>DB</strong> contiene 59.000+ righe: verrà importato un campione delle
+                            prime 5.000 righe per performance del browser.
+                        </div>
+                        <div style="text-align:right;">
+                            <button class="btn-primary-dark" id="btn-next-step2">
+                                Avanti: Preview <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Error -->
+                    <div id="file-error" style="display:none;margin-top:14px;">
+                        <div class="alert-dark-danger">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span id="error-msg-text">Errore durante la lettura.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expected Format -->
+            <div class="glass-card" style="max-width:680px;margin:0 auto;">
+                <div class="card-head">
+                    <div class="card-title"><i class="bi bi-book" style="color:#6366f1;"></i> Struttura attesa del file
+                        Excel</div>
+                </div>
+                <table class="format-table">
+                    <thead>
+                        <tr>
+                            <th>Foglio</th>
+                            <th>Colonne chiave</th>
+                            <th>Utilizzo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-indigo">RISORSE</span></td>
+                            <td><code>EMPLOYEE, RATE LEVEL, SKILLS AREA, ADRC 25, ADRC 26</code></td>
+                            <td>Aggiorna anagrafica risorse</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-green">DB</span></td>
+                            <td><code>Project Definition, WBS Element, Sold-to-Party Name, Project Manager Name, Billability</code>
+                            </td>
+                            <td>Aggiorna portafoglio progetti</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-amber">MASTER 2025</span></td>
+                            <td><code>Chiave / Valore</code></td>
+                            <td>Metadati anno 2025</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-amber">MASTER 2026</span></td>
+                            <td><code>Chiave / Valore</code></td>
+                            <td>Metadati anno 2026</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== STEP 2: Preview ===== -->
+        <div id="step-2" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <h5 style="font-weight:700;color:white;margin:0;">Anteprima Dati</h5>
+                <button class="btn-outline-dark" id="btn-back-1"><i class="bi bi-arrow-left"></i> Indietro</button>
+            </div>
+
+            <div class="glass-card">
+                <div class="dark-tabs">
+                    <button class="dark-tab active" data-tab2="tab-risorse">RISORSE</button>
+                    <button class="dark-tab" data-tab2="tab-db">DB Progetti</button>
+                    <button class="dark-tab" data-tab2="tab-master25">MASTER 2025</button>
+                    <button class="dark-tab" data-tab2="tab-master26">MASTER 2026</button>
+                </div>
+
+                <div class="tab-pane show" id="tab-risorse">
+                    <div
+                        style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);">
+                        <span style="font-size:0.83rem;font-weight:600;color:white;">Foglio RISORSE</span>
+                        <span class="badge badge-gray" id="risorse-count">0 righe</span>
+                    </div>
+                    <div class="preview-wrap">
+                        <table class="dark-table">
+                            <thead id="risorse-head"></thead>
+                            <tbody id="risorse-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer"><i class="bi bi-info-circle me-1"></i>Mostrando max 15 righe. Colonne
+                        <code
+                            style="background:rgba(99,102,241,.12);color:#a5b4fc;padding:1px 5px;border-radius:3px;">ADRC 25</code>
+                        / <code
+                            style="background:rgba(99,102,241,.12);color:#a5b4fc;padding:1px 5px;border-radius:3px;">ADRC 26</code>
+                        usate come tariffe giornaliere.
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab-db">
+                    <div
+                        style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);">
+                        <span style="font-size:0.83rem;font-weight:600;color:white;">Foglio DB</span>
+                        <span class="badge badge-gray" id="db-count">0 righe</span>
+                    </div>
+                    <div class="preview-wrap">
+                        <table class="dark-table">
+                            <thead id="db-head"></thead>
+                            <tbody id="db-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer"><i class="bi bi-info-circle me-1"></i>Campione prime 10 righe / 5.000
+                        massimo importabili.</div>
+                </div>
+                <div class="tab-pane" id="tab-master25">
+                    <div
+                        style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:0.83rem;font-weight:600;color:white;">
+                        Foglio MASTER 2025</div>
+                    <div class="preview-wrap">
+                        <table class="dark-table">
+                            <thead id="m25-head"></thead>
+                            <tbody id="m25-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab-master26">
+                    <div
+                        style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:0.83rem;font-weight:600;color:white;">
+                        Foglio MASTER 2026</div>
+                    <div class="preview-wrap">
+                        <table class="dark-table">
+                            <thead id="m26-head"></thead>
+                            <tbody id="m26-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:right;margin-top:14px;">
+                <button class="btn-primary-dark" id="btn-next-step3">
+                    Avanti: Conferma <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 3: Conferma ===== -->
+        <div id="step-3" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h5 style="font-weight:700;color:white;margin:0;">Conferma Importazione</h5>
+                <button class="btn-outline-dark" id="btn-back-2"><i class="bi bi-arrow-left"></i> Indietro</button>
+            </div>
+
+            <div class="summary-grid">
+                <!-- Risorse -->
+                <div class="summary-card">
+                    <h6><span class="badge badge-indigo" style="margin-right:6px;">RISORSE</span> <span
+                            class="badge badge-gray" id="summary-risorse-count">0</span></h6>
+                    <div class="summary-row"><span class="summary-key">Nuove risorse</span><strong class="summary-val"
+                            id="summary-risorse-new" style="color:#6ee7b7;">—</strong></div>
+                    <div class="summary-row"><span class="summary-key">Già presenti</span><strong class="summary-val"
+                            id="summary-risorse-exist" style="color:var(--muted);">—</strong></div>
+                    <div class="switch-row">
+                        <label class="dark-switch"><input type="checkbox" id="opt-import-risorse" checked><span
+                                class="dark-switch-slider"></span></label>
+                        <span>Importa risorse</span>
+                    </div>
+                </div>
+                <!-- DB Progetti -->
+                <div class="summary-card">
+                    <h6><span class="badge badge-green" style="margin-right:6px;">DB PROGETTI</span> <span
+                            class="badge badge-gray" id="summary-db-count">0</span></h6>
+                    <div class="summary-row"><span class="summary-key">Nuovi progetti</span><strong class="summary-val"
+                            id="summary-db-new" style="color:#6ee7b7;">—</strong></div>
+                    <div class="summary-row"><span class="summary-key">Già presenti</span><strong class="summary-val"
+                            id="summary-db-exist" style="color:var(--muted);">—</strong></div>
+                    <div class="switch-row">
+                        <label class="dark-switch"><input type="checkbox" id="opt-import-projects"><span
+                                class="dark-switch-slider"></span></label>
+                        <span>Importa progetti</span>
+                    </div>
+                </div>
+                <!-- Master Data -->
+                <div class="summary-card">
+                    <h6><span class="badge badge-amber" style="margin-right:6px;">MASTER DATA</span> <span
+                            class="badge badge-gray">2025 / 2026</span></h6>
+                    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">I metadati master (budget
+                        totale, invoice, target margine) saranno aggiornati nel DATA store per entrambi gli anni.</p>
+                    <div class="switch-row">
+                        <label class="dark-switch"><input type="checkbox" id="opt-import-master" checked><span
+                                class="dark-switch-slider"></span></label>
+                        <span>Importa Master Data</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warnings -->
+            <div id="import-warnings" style="display:none;margin-bottom:14px;">
+                <div class="alert-dark-warn">
+                    <h6 style="font-weight:700;margin-bottom:6px;"><i class="bi bi-exclamation-triangle me-1"></i>Avvisi
+                    </h6>
+                    <ul style="margin:0;padding-left:18px;font-size:0.8rem;" id="warnings-list"></ul>
+                </div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:10px;">
+                <a href="index.html" class="btn-cancel-dark">Annulla</a>
+                <button class="btn-success-dark" id="btn-confirm-import-excel">
+                    <i class="bi bi-check-lg"></i> Conferma Importazione
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 4: Done ===== -->
+        <div id="step-done" style="display:none;">
+            <div style="text-align:center;padding:60px 24px;">
+                <div class="done-circle"><i class="bi bi-check-lg"></i></div>
+                <h4 style="font-weight:800;color:white;margin-bottom:8px;">Importazione completata!</h4>
+                <p style="color:var(--muted);margin-bottom:28px;" id="done-summary-text">—</p>
+                <a href="index.html" class="btn-primary-dark" style="text-decoration:none;display:inline-flex;">
+                    <i class="bi bi-arrow-left"></i> Torna alla Dashboard
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/importer.js"></script>
+    <script src="assets/js/importer-ui.js"></script>
+    <script>
+        /* ========== AUTH ========== */
+        const user = JSON.parse(sessionStorage.getItem('psfc_user') || 'null');
+        if (!user) location.href = 'login.html';
+        else {
+            const name = user.name || user.email;
+            document.getElementById('sb-av').textContent = name.slice(0, 2).toUpperCase();
+            document.getElementById('sb-name').textContent = name;
+        }
+        function logout() { sessionStorage.removeItem('psfc_user'); location.href = 'login.html'; }
+
+        /* ========== DOWNLOAD TEMPLATE ========== */
+        function downloadTemplate() {
+            const wb = XLSX.utils.book_new();
+
+            // --- Sheet RISORSE ---
+            const risorse = [
+                ["EMPLOYEE", "RATE LEVEL", "SKILLS AREA", "ADRC 25", "ADRC 26"],
+                ["Mario Rossi", "L2", "Data Engineering", 450, 480],
+                ["Giulia Bianchi", "L3", "Cloud Architecture", 620, 650],
+                ["Luca Verdi", "L1", "Project Management", 380, 400]
+            ];
+            const wsRisorse = XLSX.utils.aoa_to_sheet(risorse);
+            wsRisorse['!cols'] = [{ wch: 30 }, { wch: 14 }, { wch: 22 }, { wch: 12 }, { wch: 12 }];
+            XLSX.utils.book_append_sheet(wb, wsRisorse, 'RISORSE');
+
+            // --- Sheet DB ---
+            const db = [
+                ["Project Definition", "WBS Element", "WBS Element Name", "Project Type Description", "Start Date", "Finish Date", "Sold-to-Party Name", "Bill-to-Party Name", "Project Manager Name", "Market Segment", "Billability"],
+                ["P-2025-001", "WBS-001-A", "Digital Transformation Alpha", "EXTERNAL", "2025-01-01", "2025-12-31", "Acme Corp", "Acme Corp", "Mario Rossi", "Telco", "Billable"],
+                ["P-2025-002", "WBS-002-B", "Cloud Migration Beta", "INTERNAL", "2025-03-01", "2025-09-30", "Internal", "Internal", "Giulia Bianchi", "Finance", "Non-Billable"]
+            ];
+            const wsDB = XLSX.utils.aoa_to_sheet(db);
+            wsDB['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 30 }, { wch: 22 }, { wch: 14 }, { wch: 14 }, { wch: 24 }, { wch: 24 }, { wch: 24 }, { wch: 16 }, { wch: 14 }];
+            XLSX.utils.book_append_sheet(wb, wsDB, 'DB');
+
+            // --- Sheet MASTER 2025 ---
+            const master25 = [
+                ["Chiave", "Valore"],
+                ["Budget Totale", "1500000"],
+                ["Invoice Target", "1350000"],
+                ["Target Margine %", "20"],
+                ["Anno", "2025"]
+            ];
+            const wsM25 = XLSX.utils.aoa_to_sheet(master25);
+            wsM25['!cols'] = [{ wch: 24 }, { wch: 20 }];
+            XLSX.utils.book_append_sheet(wb, wsM25, 'MASTER 2025');
+
+            // --- Sheet MASTER 2026 ---
+            const master26 = [
+                ["Chiave", "Valore"],
+                ["Budget Totale", "1650000"],
+                ["Invoice Target", "1500000"],
+                ["Target Margine %", "22"],
+                ["Anno", "2026"]
+            ];
+            const wsM26 = XLSX.utils.aoa_to_sheet(master26);
+            wsM26['!cols'] = [{ wch: 24 }, { wch: 20 }];
+            XLSX.utils.book_append_sheet(wb, wsM26, 'MASTER 2026');
+
+            XLSX.writeFile(wb, 'PSFC_Planning_Template.xlsx');
+        }
+
+        /* ========== STEP 2 TABS ========== */
+        document.querySelectorAll('.dark-tab[data-tab2]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.closest('.glass-card').querySelectorAll('.dark-tab').forEach(b => b.classList.remove('active'));
+                btn.closest('.glass-card').querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab2).classList.add('show');
+            });
+        });
+    </script>
+</body>
+
+</html>
